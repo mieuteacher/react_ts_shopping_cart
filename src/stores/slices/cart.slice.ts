@@ -14,16 +14,16 @@ interface InitialState {
 const initialState: InitialState = {
     loading: false,
     data: [
-        {
-            id: 1,
-            productId: 1,
-            quantity: 5
-        },
-        {
-            id: 2,
-            productId: 2,
-            quantity: 10
-        },
+        // {
+        //     id: 1,
+        //     productId: 1,
+        //     quantity: 5
+        // },
+        // {
+        //     id: 2,
+        //     productId: 2,
+        //     quantity: 10
+        // },
     ],
 };
 
@@ -39,9 +39,11 @@ const cartSlice = createSlice({
             } else {
                 state.data.unshift(action.payload);
             }
+            localStorage.setItem('cart', JSON.stringify(state.data))
         },
         delete: (state, action: PayloadAction<number>) => {
             state.data = state.data.filter(item => item.id != action.payload)
+            localStorage.setItem('cart', JSON.stringify(state.data))
         },
         update: (state, action: PayloadAction<CartItem>) => {
             state.data = state.data.map(product => {
@@ -50,7 +52,11 @@ const cartSlice = createSlice({
                 }
                 return product
             });
+            localStorage.setItem('cart', JSON.stringify(state.data))
         },
+        getDataLocal: (state, action: PayloadAction<CartItem[]>) => {
+            state.data = action.payload;
+        }
     }
 })
 

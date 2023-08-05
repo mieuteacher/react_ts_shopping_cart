@@ -4,6 +4,7 @@ import {RootStore} from '../../stores';
 import utilFormart from '../../utils/format';
 import { Product } from '../../stores/slices/product.slice';
 import actions  from '../../stores/actions'; 
+import { CartItem } from '../../stores/slices/cart.slice';
 export default function ShoppingCart() {
   const dispatch = useDispatch();
   const cartStore = useSelector(store => (store as RootStore).cartStore)
@@ -13,8 +14,12 @@ export default function ShoppingCart() {
     return productStore.data.find(product => product.id == productId);
   }
   useEffect(() => {
-    console.log("cartStore", cartStore.data)
-  }, [cartStore.data])
+    const storedCart = localStorage.getItem('cart');
+    
+    const cartData = storedCart ? JSON.parse(storedCart) : [];
+
+    dispatch(actions.cartAction.getDataLocal(cartData));
+  }, []);
   return (
     <div className="shoppingCart">
     <div className="titles">Shopping Cart</div>
