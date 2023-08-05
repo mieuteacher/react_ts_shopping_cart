@@ -1,9 +1,9 @@
 import React from 'react';
-
+import ShoppingCartPage from './pages/shopping_carts/Index'
 function App() {
   return (
     <div className="App">
-        <h1>Hello App</h1>
+        <ShoppingCartPage/>
     </div>
   );
 }
