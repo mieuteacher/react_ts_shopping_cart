@@ -1,6 +1,20 @@
-import React from 'react'
-
+import React, { useEffect } from 'react'
+import {useSelector, useDispatch} from 'react-redux';
+import {RootStore} from '../../stores';
+import utilFormart from '../../utils/format';
+import { Product } from '../../stores/slices/product.slice';
+import actions  from '../../stores/actions'; 
 export default function ShoppingCart() {
+  const dispatch = useDispatch();
+  const cartStore = useSelector(store => (store as RootStore).cartStore)
+  const productStore = useSelector(store => (store as RootStore).productStore)
+
+  function getProductInfor(productId: number): Product | undefined {
+    return productStore.data.find(product => product.id == productId);
+  }
+  useEffect(() => {
+    console.log("cartStore", cartStore.data)
+  }, [cartStore.data])
   return (
     <div className="shoppingCart">
     <div className="titles">Shopping Cart</div>
@@ -29,18 +43,20 @@ export default function ShoppingCart() {
           </tr>
         </thead>
         <tbody>
-              <tr>
+          {
+            cartStore.data.map((item, index) => (
+              <tr key={Date.now() * Math.random()}>
                 <th scope="row">
                   <div className="table_content">1</div>
                 </th>
                 <td>
                   <div className="table_content">
-                    Sản Phẩm 1
+                    {getProductInfor(item.productId)?.name ?? "Lỗi"}
                   </div>
                 </td>
                 <td>
                   <div className="table_content">
-                    50 000
+                    {utilFormart.convertToVND(getProductInfor(item.productId)?.price ?? 0)}
                   </div>
                 </td>
                 <td>
@@ -49,17 +65,17 @@ export default function ShoppingCart() {
                       className="quantity"
                       style={{ textAlign: "center" }}
                       type="number"
-                      defaultValue={1}
+                      defaultValue={item.quantity}
                       min={0}
                       max={
-                        10
+                        999
                       }
                     />
                   </div>
                 </td>
                 <td>
                   <div className="table_content">
-                    100000
+                    {utilFormart.convertToVND((getProductInfor(item.productId)?.price ?? 0) * item.quantity)}
                   </div>
                 </td>
                 <td>
@@ -67,28 +83,42 @@ export default function ShoppingCart() {
                     <button
                       type="button"
                       className="btn btn-info"
+                      onClick={(e) => {
+                        let quantity = Number((((e.target as HTMLElement).parentNode?.parentNode?.parentNode as HTMLElement).querySelector('.quantity') as HTMLInputElement).value)
+                        dispatch(actions.cartAction.update({
+                          ...item,
+                          quantity: quantity
+                        }))
+                      }}
                     >
                       Update
                     </button>
                     <button
                       type="button"
                       className="btn btn-danger"
+                      onClick={() => {
+                        if (window.confirm("Xóa ok?")) {
+                          dispatch(actions.cartAction.delete(item.id))
+                        }
+                      }}
                     >
                       Delete
                     </button>
                   </div>
                 </td>
               </tr>
+            ))
+          }
         </tbody>
       </table>
     </div>
-    {1 ? (
+    {cartStore.data.length == 0 ? (
       <></>
     ) : (
       <div className="table_emptyNoti">Empty product in your cart</div>
     )}
     <div className="table_emptyNoti">
-      There are 20 items in shopping cart
+      There are {cartStore.data.length} items in shopping cart
       <span
         style={{
           color: "red",
@@ -97,7 +127,13 @@ export default function ShoppingCart() {
           fontWeight: 900,
         }}
       >
-        500000
+        {
+          utilFormart.convertToVND(
+            cartStore.data.reduce((now, next) => {
+              return now += ( getProductInfor(next.productId)?.price ?? 0 ) * next.quantity
+            }, 0)
+          )
+        }
       </span>
     </div>
   </div>
