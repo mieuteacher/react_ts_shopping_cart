@@ -113,11 +113,9 @@ export default function ShoppingCart() {
       </table>
     </div>
     {cartStore.data.length == 0 ? (
-      <></>
-    ) : (
       <div className="table_emptyNoti">Empty product in your cart</div>
-    )}
-    <div className="table_emptyNoti">
+    ) : (
+      <div className="table_emptyNoti">
       There are {cartStore.data.length} items in shopping cart
       <span
         style={{
@@ -136,6 +134,7 @@ export default function ShoppingCart() {
         }
       </span>
     </div>
+    )}
   </div>
   )
 }
